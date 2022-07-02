@@ -1,5 +1,3 @@
-alert("Welcome to Ninja quiz.");
-
 const quiz = [
   { name: "Superman", realName: "Clark Kent" },
   { name: "Wonder Woman", realName: "Diane Prince" },
@@ -9,6 +7,7 @@ const quiz = [
 //viewObject
 const view = {
   score: document.querySelector("#score strong"),
+  start: document.getElementById("start"),
   question: document.getElementById("question"),
   result: document.getElementById("result"),
   info: document.getElementById("info"),
@@ -17,6 +16,12 @@ const view = {
       target.setAttribute(key, attributes[key]);
     }
     target.innerHTML = contents;
+  },
+  show(element) {
+    element.style.display = "block";
+  },
+  hide(element) {
+    element.style.display = "none";
   },
 };
 
@@ -33,6 +38,7 @@ const game = {
     }
     //end of main loop
     this.gameOver();
+    view.hide(view.start);
   },
 
   ask() {
@@ -45,13 +51,13 @@ const game = {
   check(response) {
     const answer = this.question.realName;
     if (response === answer) {
-      view.render(view.result, "Correct!", { "class": "correct" });
+      view.render(view.result, "Correct!", { class: "correct" });
       alert("Correct!");
       this.score++;
       view.render(view.score, this.score);
     } else {
       view.render(view.result, `Wrong! The correct answer was ${answer}`, {
-        "class": "wrong",
+        class: "wrong",
       });
       alert(`Wrong! The correct answer was ${answer}.`);
     }
@@ -62,7 +68,8 @@ const game = {
       view.info,
       `Game over. You scored ${this.score} point${score !== 1 ? "s" : ""}`
     );
+    view.show(view.start);
   },
 };
 
-game.start(quiz);
+view.start.addEventListener("click", () => game.start(quiz), false);
