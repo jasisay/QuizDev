@@ -8,6 +8,7 @@ const quiz = [
 const view = {
   score: document.querySelector("#score strong"),
   start: document.getElementById("start"),
+  response: document.querySelector("#response"),
   question: document.getElementById("question"),
   result: document.getElementById("result"),
   info: document.getElementById("info"),
@@ -23,6 +24,31 @@ const view = {
   hide(element) {
     element.style.display = "none";
   },
+
+  setup(){
+    this.show(this.question);
+    this.show(this.response);
+    this.show(this.result);
+    this.hide(this.start);
+    this.render(this.score,game.score);
+    this.render(this.result,'');
+    this.render(this.info,'');
+    this.resetForm();
+
+
+  },
+
+  resetForm(){
+    this.response.answer.value = '';
+    this.response.answer.focus();
+  }
+  ,
+
+  teardown(){
+    this.hide(this.question);
+    this.hide(this.response);
+    this.show(this.start);
+  }
 };
 
 // namespacing functions
@@ -30,46 +56,47 @@ const game = {
   start(quiz) {
     this.questions = [...quiz];
     this.score = 0;
-
-    // main loop
-    for (const question of this.questions) {
-      this.question = question;
-      this.ask();
-    }
-    //end of main loop
-    this.gameOver();
-    view.hide(view.start);
+    view.setup();
+    this.ask();
   },
 
   ask() {
-    const question = `What is ${this.question.name}'s real name?`;
-    view.render(this.question, question);
-    const response = prompt(question);
-    this.check(response);
+    if (this.questions.length > 0) {
+      this.question = this.questions.pop();
+      const question = `What is ${this.question.name}'s real name?`;
+      view.render(view.question, question);
+    } else {
+      this.gameOver();
+    }
   },
 
-  check(response) {
+  check(event) {
+    event.preventDefault();
+    const response = view.response.answer.value;
     const answer = this.question.realName;
-    if (response === answer) {
-      view.render(view.result, "Correct!", { class: "correct" });
-      alert("Correct!");
+    if( response === answer ){
+      view.render(view.result,'Correct!',{"class":"correct"});
       this.score++;
-      view.render(view.score, this.score);
+      view.render(view.score,this.score);
     } else {
-      view.render(view.result, `Wrong! The correct answer was ${answer}`, {
-        class: "wrong",
-      });
-      alert(`Wrong! The correct answer was ${answer}.`);
+      view.render(view.result,`Wrong! The correct answer is ${answer}`,{"class":"wrong"});
     }
+
+
+    view.resetForm();
+    this.ask();
+    
   },
 
   gameOver() {
     view.render(
       view.info,
-      `Game over. You scored ${this.score} point${score !== 1 ? "s" : ""}`
+      `Game over. You scored ${this.score} point${this.score === 1 ? "" : "s"}`
     );
-    view.show(view.start);
+    view.teardown();
   },
 };
 
 view.start.addEventListener("click", () => game.start(quiz), false);
+view.response.addEventListener("submit",(event) => game.check(event), false);
+view.hide(view.response);
