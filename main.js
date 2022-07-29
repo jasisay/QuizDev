@@ -57,6 +57,7 @@ const view = {
 // namespacing functions
 const game = {
   start(quiz) {
+    console.log('start() invoked.');
     this.secondsRemaining = 20;
     this.timer = setInterval(this.countdown,1000);
     this.questions = [...quiz];
@@ -66,6 +67,7 @@ const game = {
   },
 
   ask() {
+    console.log('ask() invoked.');
     if (this.questions.length > 0) {
       this.question = this.questions.pop();
       const question = `What is ${this.question.name}'s real name?`;
@@ -76,6 +78,7 @@ const game = {
   },
 
   check(event) {
+    console.log('check(event) invoked.');
     event.preventDefault();
     const response = view.response.answer.value;
     const answer = this.question.realName;
@@ -102,6 +105,7 @@ const game = {
   },
 
   gameOver() {
+    console.log('gameOver() invoked.');
     view.render(
       view.info,
       `Game over. You scored ${this.score} point${this.score === 1 ? "" : "s"}`
